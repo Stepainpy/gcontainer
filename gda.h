@@ -107,6 +107,16 @@
 
 #define gda_clear(a) do { (a)->count = 0; } while (0)
 
+#define gda_resize(a, newsize) do { \
+    if ((a)->count < (newsize)) {   \
+        gda_reserve(a, newsize);    \
+        memset((a)->items + (a)->count, 0, \
+            ((newsize) - (a)->count) * \
+            sizeof(*(a)->items)); \
+    } \
+    (a)->count = (newsize); \
+} while (0)
+
 /* Access functions */
 
 #define gda_front(a) \
