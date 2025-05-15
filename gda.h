@@ -14,13 +14,13 @@
 
 /* Macros definitions */
 
-#ifndef GDA_INIT_CAP
-#define GDA_INIT_CAP 32
+#ifndef GUTL_ASSERT
+#include <assert.h>
+#define GUTL_ASSERT assert
 #endif
 
-#ifndef GDA_ASSERT
-#include <assert.h>
-#define GDA_ASSERT assert
+#ifndef GDA_INIT_CAP
+#define GDA_INIT_CAP 32
 #endif
 
 #ifndef GDA_REALLOC
@@ -35,10 +35,10 @@
         if ((a)->capacity == 0)     \
             (a)->capacity = GDA_INIT_CAP; \
         while ((expect) > (a)->capacity)  \
-            (a)->capacity += ((a)->capacity + 1) / 2;  \
-        (a)->items = GDA_REALLOC((a)->items,           \
-            (a)->capacity * sizeof(*(a)->items));      \
-        GDA_ASSERT((a)->items != NULL && "No memory"); \
+            (a)->capacity += ((a)->capacity + 1) / 2; \
+        (a)->items = GDA_REALLOC((a)->items,          \
+            (a)->capacity * sizeof(*(a)->items));     \
+        GUTL_ASSERT((a)->items != NULL && "No memory"); \
     } \
 } while (0)
 
@@ -46,7 +46,7 @@
     (a)->capacity = (a)->count; \
     (a)->items = GDA_REALLOC((a)->items, \
         (a)->capacity * sizeof(*(a)->items)); \
-    GDA_ASSERT((a)->count != 0 &&             \
+    GUTL_ASSERT((a)->count != 0 &&            \
         (a)->items != NULL && "No memory");   \
 } while (0)
 
@@ -65,7 +65,7 @@
 } while (0)
 
 #define gda_insert(a, index, value) do { \
-    GDA_ASSERT((index) <= (a)->count);   \
+    GUTL_ASSERT((index) <= (a)->count);  \
     gda_reserve(a, (a)->count + 1);      \
     memmove((a)->items + (index) + 1,    \
         (a)->items + (index), ((a)->count \
@@ -74,7 +74,7 @@
 } while (0)
 
 #define gda_insert_many(a, index, array, length) do { \
-    GDA_ASSERT((index) <= (a)->count);       \
+    GUTL_ASSERT((index) <= (a)->count);      \
     gda_reserve(a, (a)->count + (length));   \
     memmove((a)->items + (index) + (length), \
         (a)->items + (index), ((a)->count -  \
@@ -85,21 +85,21 @@
 } while (0)
 
 #define gda_pop(a) \
-(GDA_ASSERT((a)->count > 0), (a)->items[--(a)->count])
+(GUTL_ASSERT((a)->count > 0), (a)->items[--(a)->count])
 
 #define gda_pop_many(a, trunc) do { \
-    GDA_ASSERT((trunc) <= (a)->count); \
+    GUTL_ASSERT((trunc) <= (a)->count); \
     (a)->count -= (trunc); \
 } while (0)
 
 #define gda_erase(a, index) do { \
-    GDA_ASSERT((index) < (a)->count); \
+    GUTL_ASSERT((index) < (a)->count); \
     memmove((a)->items + (index), (a)->items + (index) + 1,  \
         ((a)->count-- - (index) - 1) * sizeof(*(a)->items)); \
 } while (0)
 
 #define gda_erase_many(a, index, trunc) do { \
-    GDA_ASSERT((index) + (trunc) <= (a)->count); \
+    GUTL_ASSERT((index) + (trunc) <= (a)->count); \
     memmove((a)->items + (index), (a)->items + (index) + (trunc), \
         ((a)->count - (index) - (trunc)) * sizeof(*(a)->items));  \
     (a)->count -= (trunc); \
@@ -120,10 +120,10 @@
 /* Access functions */
 
 #define gda_front(a) \
-(GDA_ASSERT((a)->count > 0), (a)->items)
+(GUTL_ASSERT((a)->count > 0), (a)->items)
 
 #define gda_last(a) \
-(GDA_ASSERT((a)->count > 0), (a)->items + (a)->count - 1)
+(GUTL_ASSERT((a)->count > 0), (a)->items + (a)->count - 1)
 
 #define gda_foreach(type, var, a) \
 for (type* var = (a)->items; var < (a)->items + (a)->count; ++var)
