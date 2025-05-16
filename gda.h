@@ -5,6 +5,10 @@
  *     size_t count, capacity;
  *     ... and your stuffs ...
  * }
+ * 
+ * if defined GDA_ENABLE_DTOR in add fields:
+ * dtor - function pointer to destructor with
+ *        one argument as pointer
  */
 
 #ifndef GENERIC_DYNAMIC_ARRAY_H
@@ -27,6 +31,14 @@
 #include <stdlib.h>
 #define GDA_REALLOC realloc
 #endif
+
+#ifdef GDA_ENABLE_DTOR
+#define GDA_HAS_DTOR 1
+#define GDA_DTOR(block) do { block } while (0)
+#else
+#define GDA_HAS_DTOR 0
+#define GDA_DTOR(block) ((void)0)
+#endif /* GDA_ENABLE_DTOR */
 
 /* Memory managment */
 
@@ -84,28 +96,52 @@
     (a)->count += (length); \
 } while (0)
 
+#if !GDA_HAS_DTOR
 #define gda_pop(a) \
 (GUTL_ASSERT((a)->count > 0), (a)->items[--(a)->count])
+#else
+#define gda_pop(a) do { \
+    GUTL_ASSERT((a)->count > 0); \
+    (a)->dtor((a)->items + --(a)->count); \
+} while (0)
+#endif /* !GDA_HAS_DTOR */
 
 #define gda_pop_many(a, trunc) do { \
     GUTL_ASSERT((trunc) <= (a)->count); \
+    GDA_DTOR( \
+        for (size_t _gda_i = (a)->count - (trunc); \
+            _gda_i < (a)->count; _gda_i++)  \
+            (a)->dtor((a)->items + _gda_i); \
+    ); \
     (a)->count -= (trunc); \
 } while (0)
 
 #define gda_erase(a, index) do { \
     GUTL_ASSERT((index) < (a)->count); \
+    GDA_DTOR( (a)->dtor((a)->items + (index)); ); \
     memmove((a)->items + (index), (a)->items + (index) + 1,  \
         ((a)->count-- - (index) - 1) * sizeof(*(a)->items)); \
 } while (0)
 
 #define gda_erase_many(a, index, trunc) do { \
     GUTL_ASSERT((index) + (trunc) <= (a)->count); \
+    GDA_DTOR( \
+        for (size_t _gda_i = (index); \
+        _gda_i < (index) + (trunc); _gda_i++) \
+            (a)->dtor((a)->items + _gda_i);   \
+    ); \
     memmove((a)->items + (index), (a)->items + (index) + (trunc), \
         ((a)->count - (index) - (trunc)) * sizeof(*(a)->items));  \
     (a)->count -= (trunc); \
 } while (0)
 
-#define gda_clear(a) do { (a)->count = 0; } while (0)
+#define gda_clear(a) do { \
+    GDA_DTOR( \
+        for (size_t _gda_i = 0; _gda_i < (a)->count; _gda_i++)  \
+            (a)->dtor((a)->items + _gda_i); \
+    ); \
+    (a)->count = 0; \
+} while (0)
 
 #define gda_resize(a, newsize) do { \
     if ((a)->count < (newsize)) {   \
@@ -114,6 +150,11 @@
             ((newsize) - (a)->count) * \
             sizeof(*(a)->items)); \
     } \
+    GDA_DTOR(if ((a)->count > (newsize))    \
+        for (size_t _gda_i = (newsize);     \
+            _gda_i < (a)->count; _gda_i++)  \
+            (a)->dtor((a)->items + _gda_i); \
+    ); \
     (a)->count = (newsize); \
 } while (0)
 
