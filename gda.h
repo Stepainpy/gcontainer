@@ -38,7 +38,7 @@
 #else
 #define GDA_HAS_DTOR 0
 #define GDA_DTOR(block) ((void)0)
-#endif /* GDA_ENABLE_DTOR */
+#endif
 
 /* Memory managment */
 
@@ -104,7 +104,7 @@
     GUTL_ASSERT((a)->count > 0); \
     (a)->dtor((a)->items + --(a)->count); \
 } while (0)
-#endif /* !GDA_HAS_DTOR */
+#endif
 
 #define gda_pop_many(a, trunc) do { \
     GUTL_ASSERT((trunc) <= (a)->count); \
