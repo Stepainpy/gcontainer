@@ -89,7 +89,7 @@
         int _gh_field = (2 * (1 << (_gh_height - _gh_h - 1)) - 1) * (max_width); \
         for (size_t _gh_l = ((size_t)1 << _gh_h) - 1;                             \
             _gh_l < ((size_t)1 << (_gh_h + 1)) - 1 && _gh_l < (h)->count; _gh_l++) \
-            printf("%*s%*"type_spec"%*s",                                       \
+            printf("%*s%*"type_spec"%*s",                                          \
                 (_gh_field - (max_width)) / 2, "", (max_width), (h)->items[_gh_l], \
                 (_gh_field - (max_width)) / 2 + (max_width), ""); \
         putchar(10); \
