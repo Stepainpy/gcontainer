@@ -54,7 +54,7 @@
         gh_heapify(a, _gh_ii); \
 } while (0)
 
-#define gh_push(h, value) do { \
+#define gh_push(h) do { \
     size_t _gh_i = (h)->count - 1;  \
     size_t _gh_p = (_gh_i - 1) / 2; \
     while (_gh_i > 0 && (h)->cmp(   \
