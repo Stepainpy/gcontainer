@@ -17,11 +17,11 @@
 #include "gheap.h"
 
 #define gprq_push(pq, value) do { \
-    gda_push(pq, value); gh_push(pq); \
+    gda_push(pq, value); ghp_push(pq); \
 } while (0)
 
 #define gprq_pop(pq, retp) do { \
-    gh_pop(pq); *(retp) = gh_poped(pq); \
+    ghp_pop(pq); *(retp) = ghp_poped(pq); \
 } while (0)
 
 #define gprq_peek gda_front
