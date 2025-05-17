@@ -14,7 +14,7 @@
 #ifndef GENERIC_HEAP_H
 #define GENERIC_HEAP_H
 
-#include <stddef.h>
+#include "gda.h"
 
 #ifndef GUTL_ASSERT
 #include <assert.h>
@@ -54,7 +54,8 @@
         ghp_heapify(a, _ghp_ii); \
 } while (0)
 
-#define ghp_push(h) do { \
+#define ghp_push(h, value) do { \
+    gda_push(h, value); \
     size_t _ghp_i = (h)->count - 1;   \
     size_t _ghp_p = (_ghp_i - 1) / 2; \
     while (_ghp_i > 0 && (h)->cmp(    \
@@ -64,13 +65,12 @@
     } \
 } while (0)
 
-#define ghp_pop(h) do { \
+#define ghp_pop(h, out) do { \
     GUTL_ASSERT((h)->count > 0); \
     gutl_swapp((h)->items, (h)->items + (h)->count - 1); \
-    --(h)->count; ghp_heapify(h, 0); \
+    (out) = *gda_last(h); --(h)->count; \
+    ghp_heapify(h, 0); \
 } while (0)
-
-#define ghp_poped(h) ((h)->items[(h)->count])
 
 #define ghp_sort(h) do { \
     ghp_init(h); \

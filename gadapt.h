@@ -16,14 +16,8 @@
 #include "gda.h"
 #include "gheap.h"
 
-#define gprq_push(pq, value) do { \
-    gda_push(pq, value); ghp_push(pq); \
-} while (0)
-
-#define gprq_pop(pq, retp) do { \
-    ghp_pop(pq); *(retp) = ghp_poped(pq); \
-} while (0)
-
+#define gprq_push ghp_push
+#define gprq_pop  ghp_pop
 #define gprq_peek gda_front
 
 #endif /* GAD_INCLUDE_PR_QUEUE */
