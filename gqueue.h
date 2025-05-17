@@ -1,6 +1,7 @@
 /* in GQU argument 'q' has type like as:
  * struct {
- *     ... as GDA structure ...
+ *     <type>* items;
+ *     size_t count, capacity;
  *     size_t read, write;
  *     ... and your stuffs ...
  * }

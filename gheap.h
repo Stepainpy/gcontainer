@@ -1,7 +1,8 @@
 /* in GHP argument 'h' has type like as:
  * struct {
- *     ... as GDA structure ...
- *     int (*cmp)(<ptr>, <ptr>);
+ *     <type>* items;
+ *     size_t count, capacity;
+ *     int (*cmp)([const] <type>*, [const] <type>*);
  *     ... and your stuffs ...
  * }
  * 
@@ -14,15 +15,41 @@
 #ifndef GENERIC_HEAP_H
 #define GENERIC_HEAP_H
 
-#include "gda.h"
+#include <string.h>
+
+/* Macros definitions */
 
 #ifndef GUTL_ASSERT
 #include <assert.h>
 #define GUTL_ASSERT assert
 #endif
 
+#ifndef GHP_INIT_CAP
+#define GHP_INIT_CAP 32
+#endif
+
+#ifndef GHP_REALLOC
+#include <stdlib.h>
+#define GHP_REALLOC realloc
+#endif
+
+/* Memory managment */
+
+#define ghp_reserve(h, expect) do { \
+    if ((expect) > (h)->capacity) { \
+        if ((h)->capacity == 0)     \
+            (h)->capacity = GHP_INIT_CAP; \
+        while ((expect) > (h)->capacity)  \
+            (h)->capacity += ((h)->capacity + 1) / 2; \
+        (h)->items = GHP_REALLOC((h)->items,          \
+            (h)->capacity * sizeof(*(h)->items));     \
+        GUTL_ASSERT((h)->items != NULL && "No memory"); \
+    } \
+} while (0)
+
+/* Support functions */
+
 #ifndef gutl_swapp
-#include <string.h>
 #define gutl_swapp(ap, bp) do { \
     char gutl_swapp[sizeof *(ap) == sizeof *(bp)  \
         ? sizeof *(ap) : (size_t)-1];             \
@@ -49,13 +76,16 @@
     } \
 } while (0)
 
+/* Modification functions */
+
 #define ghp_init(h) do { \
     for (size_t _ghp_ii = (h)->count / 2; _ghp_ii --> 0;) \
         ghp_heapify(a, _ghp_ii); \
 } while (0)
 
 #define ghp_push(h, value) do { \
-    gda_push(h, value); \
+    ghp_reserve(h, (h)->count + 1); \
+    (h)->items[(h)->count++] = (value); \
     size_t _ghp_i = (h)->count - 1;   \
     size_t _ghp_p = (_ghp_i - 1) / 2; \
     while (_ghp_i > 0 && (h)->cmp(    \
