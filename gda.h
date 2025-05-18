@@ -34,10 +34,10 @@
 
 #ifdef GDA_ENABLE_DTOR
 #define GDA_HAS_DTOR 1
-#define GDA_DTOR(block) do { block } while (0)
+#define GDA_DTOR(stmt) stmt
 #else
 #define GDA_HAS_DTOR 0
-#define GDA_DTOR(block) ((void)0)
+#define GDA_DTOR(stmt)
 #endif
 
 /* Memory managment */
@@ -112,13 +112,13 @@
         for (size_t _gda_i = (a)->count - (trunc); \
             _gda_i < (a)->count; _gda_i++)  \
             (a)->dtor((a)->items + _gda_i); \
-    ); \
+    ) \
     (a)->count -= (trunc); \
 } while (0)
 
 #define gda_erase(a, index) do { \
     GUTL_ASSERT((index) < (a)->count); \
-    GDA_DTOR( (a)->dtor((a)->items + (index)); ); \
+    GDA_DTOR( (a)->dtor((a)->items + (index)); ) \
     memmove((a)->items + (index), (a)->items + (index) + 1,  \
         ((a)->count-- - (index) - 1) * sizeof(*(a)->items)); \
 } while (0)
@@ -129,7 +129,7 @@
         for (size_t _gda_i = (index); \
         _gda_i < (index) + (trunc); _gda_i++) \
             (a)->dtor((a)->items + _gda_i);   \
-    ); \
+    ) \
     memmove((a)->items + (index), (a)->items + (index) + (trunc), \
         ((a)->count - (index) - (trunc)) * sizeof(*(a)->items));  \
     (a)->count -= (trunc); \
@@ -139,7 +139,7 @@
     GDA_DTOR( \
         for (size_t _gda_i = 0; _gda_i < (a)->count; _gda_i++)  \
             (a)->dtor((a)->items + _gda_i); \
-    ); \
+    ) \
     (a)->count = 0; \
 } while (0)
 
@@ -154,7 +154,7 @@
         for (size_t _gda_i = (newsize);     \
             _gda_i < (a)->count; _gda_i++)  \
             (a)->dtor((a)->items + _gda_i); \
-    ); \
+    ) \
     (a)->count = (newsize); \
 } while (0)
 
