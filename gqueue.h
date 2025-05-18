@@ -28,6 +28,11 @@
 #define GQU_REALLOC realloc
 #endif
 
+#define gqu_type(type) struct { \
+    type* items; size_t count,  \
+    capacity, read, write;      \
+}
+
 /* Memory managment */
 
 #define gqu_reserve(q, expect) do { \

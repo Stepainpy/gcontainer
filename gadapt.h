@@ -6,12 +6,14 @@
 
 /* Stack */
 
+#define gstk_type gda_type
 #define gstk_push gda_push
 #define gstk_pop  gda_pop
 #define gstk_top  gda_last
 
 /* Priority queue */
 
+#define gprq_type ghp_type
 #define gprq_push ghp_push
 #define gprq_pop  ghp_pop
 #define gprq_peek gda_front

@@ -40,6 +40,11 @@
 #define GDA_DTOR(stmt)
 #endif
 
+#define gda_type(type) struct { \
+    type* items; size_t count, capacity; \
+    GDA_DTOR(void (*dtor)(type*);) \
+}
+
 /* Memory managment */
 
 #define gda_reserve(a, expect) do { \

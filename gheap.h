@@ -2,7 +2,7 @@
  * struct {
  *     <type>* items;
  *     size_t count, capacity;
- *     int (*cmp)([const] <type>*, [const] <type>*);
+ *     int (*cmp)(const <type>*, const <type>*);
  *     ... and your stuffs ...
  * }
  * 
@@ -32,6 +32,11 @@
 #include <stdlib.h>
 #define GHP_REALLOC realloc
 #endif
+
+#define ghp_type(type) struct { \
+    type* items; size_t count, capacity;  \
+    int (*cmp)(const type*, const type*); \
+}
 
 /* Memory managment */
 
