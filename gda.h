@@ -67,6 +67,14 @@
         (a)->items != NULL && "No memory");   \
 } while (0)
 
+#define gda_copy(dst, src) do { \
+    gda_clear(dst); \
+    gda_reserve(dst, (src)->count);    \
+    memcpy((dst)->items, (src)->items, \
+        (src)->count * sizeof(*(src)->items)); \
+    (dst)->count = (src)->count; \
+} while (0)
+
 /* Modification functions */
 
 #define gda_push(a, value) do { \
