@@ -85,7 +85,7 @@
 
 #define ghp_init(h) do { \
     for (size_t _ghp_ii = (h)->count / 2; _ghp_ii --> 0;) \
-        ghp_heapify(a, _ghp_ii); \
+        ghp_heapify(h, _ghp_ii); \
 } while (0)
 
 #define ghp_push(h, value) do { \
@@ -103,15 +103,21 @@
 #define ghp_pop(h, out) do { \
     GUTL_ASSERT((h)->count > 0); \
     gutl_swapp((h)->items, (h)->items + (h)->count - 1); \
-    (out) = *gda_last(h); --(h)->count; \
+    (out) = (h)->items[--(h)->count]; \
     ghp_heapify(h, 0); \
+} while (0)
+
+#define ghp_noret_pop(h) do { \
+    GUTL_ASSERT((h)->count > 0); \
+    gutl_swapp((h)->items, (h)->items + (h)->count - 1); \
+    --(h)->count; ghp_heapify(h, 0); \
 } while (0)
 
 #define ghp_sort(h) do { \
     ghp_init(h); \
     size_t _ghp_count = (h)->count; \
-    while ((h)->count) ghp_pop(h);  \
-    (h)->count = _ghp_count;        \
+    while ((h)->count) ghp_noret_pop(h); \
+    (h)->count = _ghp_count; \
 } while (0)
 
 #ifndef GH_NO_PRINT
