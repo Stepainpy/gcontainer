@@ -63,11 +63,19 @@
     ++(q)->count; \
 } while (0)
 
-#define gqu_pop(q, ret) do { \
+#define gqu_pop(q, out) do { \
     GUTL_ASSERT((q)->count > 0); \
-    (ret) = (q)->items[(q)->read++]; \
+    (out) = (q)->items[(q)->read++]; \
     (q)->read %= (q)->capacity; \
     --(q)->count; \
 } while (0)
+
+#define gqu_noret_pop(q) do { \
+    GUTL_ASSERT((q)->count > 0); \
+    (q)->read = ((q)->read + 1) % (q)->capacity; \
+    --(q)->count; \
+} while (0)
+
+#define gqu_peek(q) (GUTL_ASSERT((q)->count > 0), (q)->items + (q)->read)
 
 #endif /* GENERIC_QUEUE_H */
